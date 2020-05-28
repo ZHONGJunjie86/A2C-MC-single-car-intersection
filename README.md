@@ -15,7 +15,7 @@
   The GAMA platform has a modle "simple_intersection.gaml", which is assigned a car and some traffic lights. The model will sent some data
 [real_speed, target_speed, elapsed_time_ratio, distance_to_goal,reward,done,time_pass,over] as a matrix to python environment, in which the cat's accelerate will be calculated.
   
-    The interaction between the GAMA platform and python's environment is build by csv files. So GAMA model needs to use R-plugin and the R environment needs package "reticulate" to connect with python (however I use python usually).
+  The interaction between the GAMA platform and python's environment is build by csv files. So GAMA model needs to use R-plugin and the R environment needs package "reticulate" to connect with python (however I use python usually).
                               
                       
   ![image](https://github.com/ZHONGJunjie86/A3C-single-car-intersection/blob/master/illustrate/illustrate.gif )   
