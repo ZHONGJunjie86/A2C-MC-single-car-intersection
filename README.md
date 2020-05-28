@@ -1,4 +1,4 @@
-# A3C-single-car-intersection
+# A2C-single-car-intersection
   This is a model describing a car runs to goal in limited time with A2C algorithm.
   The car will learn to control its accelerate with the restructions shown below:
   
@@ -7,8 +7,8 @@
   r terminal：-1：crash / time expires
               0:non-terminal state
   r speed： related to the target speed
-  if sa ≤st: sa/st*kp
-  if sa > st: kp - (sa-st)/st*kn
+  if sa ≤st: sa/st*kp;
+  if sa > st: kp - (sa-st)/st*kn.
 
   In my experiment I set ky = ks = 0.05,kp = 0.001,kn = 0.03. 
   
