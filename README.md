@@ -2,7 +2,7 @@
    This is a basic model describing a car runs to goal in limited time by using A2C algorithm to control its speed.    
    Now, My purpose is building a architecture at frist, which I can use later. By the A2C I wrote I'll write a A3C model in the next time, in which I'll complete a multi-agents system(MAS).
 # Reward shaping
-   The work I did is very simple.   
+   The work in this model is very simple.   
    Input [real_speed, target_speed, elapsed_time_ratio, distance_to_goal,reward,done,time_pass,over]    
    Output accelerate.
   
