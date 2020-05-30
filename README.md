@@ -22,7 +22,7 @@
    [real_speed, target_speed, elapsed_time_ratio, distance_to_goal,reward,done,time_pass,over]  
    as a matrix to python environment, calculating the car's accelerate by A2C. And applying to the Markov Decision Process framework, the car in the GAMA will take up the accelerate and send the latest data to python again and over again until  reaching the destination.
 # Architecture
-   The interaction between the GAMA platform and python's environment is build by csv files. So GAMA model needs to use R-plugin and the R environment needs package "reticulate" to connect with python (I use python more usually).
+   The interaction between the GAMA platform and python environment is built on csv files IO. So GAMA model needs to use R-plugin and the R environment needs package "reticulate" to connect with python (I use python more usually).
                               
                       
   ![image](https://github.com/ZHONGJunjie86/A3C-single-car-intersection/blob/master/illustrate/illustrate.gif )   
