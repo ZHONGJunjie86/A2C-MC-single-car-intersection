@@ -1,5 +1,5 @@
 # A2C-single-car-intersection
-   This is a model describing a car runs to goal in limited time using A2C algorithm to control its speed. 
+   This is a model describing a car runs to goal in limited time using A2C algorithm to control its speed.    
    My purpose is building a architecture at frist, for the futureBy the A2C i wrote I'll write a A3C model in the next time, in which I'll complete a multi-agents system(MAS).
 # Reward shaping
    The work I did now is very simple. 
