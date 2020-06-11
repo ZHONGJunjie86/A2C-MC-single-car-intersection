@@ -32,4 +32,9 @@
   ------------
   ![image](https://github.com/ZHONGJunjie86/A3C-single-car-intersection/blob/master/illustrate/A3C-Architecture.JPG) 
   # Experiment
-  
+           random_node <- int(rnd(12));
+           target<- node_agt(random_node);
+           true_target <- node_agt(random_node);
+		       final_target <- node_agt(random_node).location;	
+		       a_flag_checked_pass_light <- 1;
+		       location <- any_location_in(node_agt(5)); 
