@@ -170,29 +170,38 @@ global {
 
 //路線バスの基本形エージェント
   species bus skills: [advanced_driving,RSkill] { 
-  	  //int rand_start <-5;//rnd(12);
-	  //int rand_goal <- 10;//rnd(12);
 	  rgb color <- rnd_color(255);
-	  bool checked <-false;
-  	  node_agt target <- node_agt(12); //12
-	  node_agt true_target <- node_agt(12);
-	  //node_agt constant_target ;
+	  bool green_light_checked <-false;
+  	  node_agt target; 
+	  node_agt true_target;
 	  node_agt bus_start;
 	  int n <-1;
 	  int m <- rnd(n);//乱数でバスのルートを決定
-      //
+      // 自作
       int time_pass;
 	  int first_time <- 1;
 	  int over;
       int check_receive <- 0;
+      int random_node;
 	  unknown read_python;
 	  unknown pause;
 	  unknown clear;
       float reward <- 0.0;
       float acceleration ; 
-      float target_speed;   //current_road.maxspeed; roads[0]
+      float target_speed;   
 	  float elapsed_time_ratio;
-	  
+	  int a_flag_checked_pass_light <- nil;
+	
+	action road_weight{
+		if(m=0){
+			 road_network <- road_network with_weights kagayaki_route;//重みを地図に適応		
+			 current_path <- compute_path(graph: road_network,target: target);
+		 }
+		 if(m=1){
+		   road_network <- road_network with_weights kasayama_route;//重みを地図に適応
+		   current_path <- compute_path(graph: road_network,target: target);
+		 } 
+	}
 	action reward_calculate{
     	if(time_pass != 0){
 		  if(real_speed<=target_speed){
@@ -228,85 +237,67 @@ global {
 	      }
 	      //wait over. caculate
 	      acceleration  <- read_python at 1;     write"check_receive acceleration:"+acceleration;
-          //clear write "clear";loop s over:Rcode_clear.contents{clear<- R_eval(s);}
+          //clear write "clear";loop s over:Rcode_clear.contents{clear<- R_eval(s);}  //seems useless
 	      save [0] to: "D:/Software/GamaWorkspace/Python/python_AC_1.csv"  type: "csv" header: false;//
 	      save [0] to: "D:/Software/GamaWorkspace/Python/python_AC_2.csv"  type: "csv" header: false;
       }    
-    
-	reflex change when :current_path = nil{	
-		//write "reflex change:final_target <- nil;"+nil;
-		final_target <- nil;
+    				        
+	reflex change when :current_path = nil{		
+		a_flag_checked_pass_light <- nil;
+		write "a_flag_checked_pass_light: "+ a_flag_checked_pass_light;
 	}
-	//信号に引っかかった後の処理
-	reflex time_to_go when: final_target = nil and checked = true {
+	
+	//信号に引っかかった後の処理  等红灯。。。
+	reflex time_to_go when: a_flag_checked_pass_light != 0 and green_light_checked = true {
 		if(true_target != nil){
 			target <- true_target;
 			true_target <- nil;
 		}
-		if(m=0){
-			road_network <- road_network with_weights kagayaki_route;//重みを地図に適応		
-			current_path <- compute_path(graph: road_network,target: target);
-		}
-		if(m=1){
-			road_network <- road_network with_weights kasayama_route;//重みを地図に適応
-			current_path <- compute_path(graph: road_network,target: target);
-		}
-		final_target <- node_agt(12).location;
+		do road_weight;
 	}	
+	
 	//目的地（終着バスターミナル）についた時の処理  && 最初の時
-	 reflex time_to_restart when:final_target = nil and checked = false{ // (final_target = nil and checked = false) or (location distance_to any_location_in(node_agt(12)))<3 #m 
-	    if(first_time != 1){
-            done <- 1;
-            write "done!!";
-         	do Python_A3C;
-		    episode <- episode + 1 ; //加到1000，算完最后结果
-        }
-        else{
-        	first_time <- 0;
-        }
-        write "計算";
-        real_speed <- 0;
-        time_pass <- 0;
-        time_target <- 12+ rnd(13);
-        target_speed<-9 + rnd(3)°m/°s;
+	 reflex time_to_restart when:distance_to_goal<=1 or first_time = 1 #m{  //a_flag_checked_by_light = 0 and checked = false
+	     if(first_time != 1){
+             done <- 1;
+             write "done!!";
+          	 do Python_A3C;
+		     episode <- episode + 1 ; //加到1000，算完最后结果
+         }
+         else{
+         	first_time <- 0;
+         }
+         write "計算";
+         real_speed <- 0;
+         time_pass <- 0;
+         time_target <- 20+ rnd(3);
+         target_speed<- 9 + rnd(3)°m/°s;
         
-        /*loop while:rand_start = rand_goal {
-		rand_start <-rnd(12);
-		rand_goal <- rnd(12);
-		}*/
-		location <- any_location_in(node_agt(5)); //5rand_start
-		if(m=0){
-			 road_network <- road_network with_weights kagayaki_route;//重みを地図に適応		
-			 current_path <- compute_path(graph: road_network,target: target);
-		 }
-		 if(m=1){
-		   road_network <- road_network with_weights kasayama_route;//重みを地図に適応
-		   current_path <- compute_path(graph: road_network,target: target);
-		   }  
-		 //true_target <- node_agt(rand_goal);
-		 //target <- node_agt(rand_goal);
-		 final_target <- node_agt(12).location;	 //
-		 //constant_target <- node_agt(rand_goal);
-		 write "change place";
-		 //done <- 0;
+         random_node <- int(rnd(12));
+         target<- node_agt(random_node);
+         true_target <- node_agt(random_node);
+		 final_target <- node_agt(random_node).location;	
+		 a_flag_checked_pass_light <- 1;
+		 location <- any_location_in(node_agt(5)); 
+		 do road_weight;
 	} 
 	
-	reflex move when: current_path != nil and final_target != nil{//道が決まり、目的地が決まれば動く
+	reflex move when: current_path != nil or a_flag_checked_pass_light != 0 {//道が決まり、目的地が決まれば動く  
 	    if (episode<total_episode and done = 0 ){
            do Python_A3C;
-           real_speed <- real_speed + acceleration ;  //+ acceleration //real_speed <- real_speed + 5;
+           real_speed <- real_speed + acceleration ;  //1;//
            if(real_speed<=0){real_speed <- 0;}
         }
         if(episode<total_episode and done = 1){
-           done<-0;//  
+           done<-0;
            do Python_A3C;
-           real_speed <- real_speed + 0;  //+ acceleration //real_speed <- real_speed + 5;
+           real_speed <- real_speed + acceleration; 
            if(real_speed<=0){real_speed <- 0;}
         }
 		do drive;
-	    time_pass <- time_pass + 1; //done <- 0;
+	    time_pass <- time_pass + 1;
+	    //write "check: "+green_light_checked + "a_flag_checked_by_light: " + a_flag_checked_pass_light;
 	}
-
 	aspect car3D {
 		if (current_road) != nil {
 			point loc <- calcul_loc();
@@ -337,28 +328,8 @@ global {
 	}
 
 }
-/*
-         	write "最後の計算";
-            real_speed <- 0;
-            time_pass <- 0;
-            time_target <- 30+ rnd(15);
-        
-		    location <- any_location_in(node_agt(5));
-		    if(m=0){
-			     road_network <- road_network with_weights kagayaki_route;//重みを地図に適応		
-			     current_path <- compute_path(graph: road_network,target: target);
-		     }
-		
-		     if(m=1){
-			     road_network <- road_network with_weights kasayama_route;//重みを地図に適応
-			     current_path <- compute_path(graph: road_network,target: target);
-		     }
-		     final_target <- node_agt(12).location;	
-		     write "change place";
-		     done <- 0;*/
+
 species road skills: [skill_road] { 
-	/*create road from: shape_file_roads with:[id::int(read("id")),nblanes::int(read("lanes")),maxspeed::int(read("maxspeed")),highway::string(read("highway")),
-			kasayama::int(read("kasayama")),kagayaki::int(read("kagayaki")),pana_east::int(read("pana-east"))]*/
     int id;
     int nblanes;
     string highway;
@@ -394,12 +365,14 @@ species node_agt skills: [skill_road_node] {
 	int counter;
 	int offset <- 0;
 	bool is_blue <- true;
-	list<road> current_shows ; //現示
+	list<road> current_accessible ; //現通行可
+	list<road> current_forbidden ; //現通行不可
 	list<node_agt> adjoin_node;//隣接交差点[東,西,南,北]
 	string mode <- "independence";
 	agent c1; //信号制御で止める車1
 	agent c2; //信号制御で止める車2
-	
+	agent f1;
+	agent f2;
 
 	//オフセット設定（広域信号制御の際に使用）
 	reflex set_offset when:time = time_to_set_offset and is_traffic_signal{
@@ -408,7 +381,6 @@ species node_agt skills: [skill_road_node] {
 			starting_point.adjoin_node[i].offset <- 0;
 		}	
 	}
-	
 	
 	//起点モード（広域信号制御の際に使用）
 	reflex set_adjoinnode when: time = 0{
@@ -421,103 +393,131 @@ species node_agt skills: [skill_road_node] {
 	
 	
 	//現示の切り替えタイミング
-	reflex start when:counter >= cycle*split+offset {// even (cycle)
-		
+	reflex start when:counter = 10 {//counter >= cycle*split+offset  even()
 			counter <- 0; 
 			is_blue <- !is_blue; //
-			
 	} 
 	
 	//4叉路用信号制御処理
 	reflex stop4 when:is_traffic_signal and length(roads_in) = 4
 	{
-		
 		counter <- counter + 1;
 		
 		if(contains(bus,c1)){ //c1是bus吗
-			bus(c1).checked <- false;
+			bus(c1).green_light_checked <- false;
 		}
 	
 		if(contains(bus,c2)){
-			bus(c2).checked <- false;
+			bus(c2).green_light_checked <- false;
 		}
 		
 		if(contains(people,c1)){
-			people(c1).checked <- false;
+			people(c1).green_light_checked <- false;
 		} 
 		if(contains(people,c2)){
-			people(c2).checked <- false;
+			people(c2).green_light_checked <- false;
 		}
-		
 		
 		c1 <- nil;
 		c2 <- nil;
 		
-		
-		//現示処理（通行権付与処理）
+		//現示処理（通行権付与処理）  绿灯能通行的路
 		if (is_blue) {		
-				current_shows <- [road(roads_in[0]),road(roads_in[2])];				
-				}else{
-				current_shows <- [road(roads_in[1]),road(roads_in[3])]; 
-			}
-		
-		if(length(current_shows) != 0){
-			if(length(current_shows[0].all_agents) != 0 ){
-				c1 <- current_shows[0].all_agents[0]; 
-				
+		    current_accessible <- [road(roads_in[0]),road(roads_in[2])];
+		    current_forbidden <- [road(roads_in[1]),road(roads_in[3])];
+		}
+		else{       		
+			current_accessible <- [road(roads_in[1]),road(roads_in[3])];
+			current_forbidden <- [road(roads_in[0]),road(roads_in[2])];
+		}
+		 
+		if(length(current_accessible) != 0 or length(current_forbidden) != 0 ){
+			if(length(current_accessible[0].all_agents) != 0 ){  //current_shows[0]----road(roads_in[0]) or road(roads_in[1])
+				c1 <- current_accessible[0].all_agents[0]; //c1 可以走的路的第一条 上面的所有agent
 				if(contains(bus,c1)){
 					bus(c1).true_target <- bus(c1).target;
-					bus(c1).final_target <- any_location_in(self);
-					bus(c1).checked <- true;
+					//bus(c1).final_target <- any_location_in(self);
+					bus(c1).a_flag_checked_pass_light <- int(any_location_in(self));
+					bus(c1).green_light_checked <- true;
 				}
-				
 				if(contains(people,c1)){
 					people(c1).true_target <- people(c1).target;
 					people(c1).final_target <- any_location_in(self);
-					people(c1).checked <- true;
+					people(c1).green_light_checked <- true;
 				}
-			}
-			
-			if(length(current_shows[1].all_agents) != 0){
-				c2 <- current_shows[1].all_agents[0];
-				
+				//write "c1: "+c1+"a_flag_checked_by_light: " + bus(c1).a_flag_checked_pass_light+" current_path"+bus(c1).current_path;
+			 }
+			                                               //current_shows[1]----road(roads_in[2]) or road(roads_in[3])
+		    if(length(current_accessible[1].all_agents) != 0){  //all_agents: the list of agents on the road 
+				c2 <- current_accessible[1].all_agents[0]; //c2 可以走的路的第二条 上面的所有agent
+				write "c2: "+c2;
 				if(contains(bus,c2)){
 					bus(c2).true_target <- bus(c2).target;
-					bus(c2).final_target <- any_location_in(self);
-					bus(c2).checked <- true; //false;//
+					//bus(c2).final_target <- any_location_in(self);
+					bus(c2).a_flag_checked_pass_light <- int(any_location_in(self));
+					bus(c2).green_light_checked <- true; 
 				}
 				
 				if(contains(people,c2)){
 					people(c2).true_target <- people(c2).target;
 					people(c2).final_target <- any_location_in(self);
-					people(c2).checked <- true;
+					people(c2).green_light_checked <- true;
 				}
-			}
+			 }
+			 //不能通行
+			 if(length(current_forbidden[0].all_agents) != 0){  
+				f1 <- current_forbidden[0].all_agents[0]; 
+				if(contains(bus,f1)){
+					bus(f1).true_target <- bus(f1).target;
+					//bus(c2).final_target <- any_location_in(self);
+					bus(f1).a_flag_checked_pass_light <- 0;//int(any_location_in(self));
+					bus(f1).green_light_checked <- false; 
+				}
+				
+			     if(contains(people,f1)){
+					people(f1).true_target <- people(f1).target;
+					//people(c2).final_target <- any_location_in(self);
+					people(f1).green_light_checked <- false;
+				}
+			   }
+			   if(length(current_forbidden[1].all_agents) != 0){ 
+				    f2 <- current_forbidden[1].all_agents[0]; 
+				    write "f2: "+f2;
+				    if(contains(bus,c2)){
+					    bus(f2).true_target <- bus(f2).target;
+					    //bus(c2).final_target <- any_location_in(self);
+					    bus(f2).a_flag_checked_pass_light <- 0;//int(any_location_in(self));
+					    bus(f2).green_light_checked <- false; 
+				}
+				
+				if(contains(people,f2)){
+					people(f2).true_target <- people(f2).target;
+					people(f2).final_target <- 0;//any_location_in(self);
+					people(f2).green_light_checked <- false;
+				}
+			 }
 		}
 	}
-		
 		
 	//3叉路用信号制御処理		
 	reflex stop3 when:is_traffic_signal and  length(roads_in) =  3{
 		
 		counter <- counter + 1;
-		
-
 
 		//以下初期化
 		if(contains(bus,c1)){
-			bus(c1).checked <- false;
+			bus(c1).green_light_checked <- false;
 		}
 	
 		if(contains(bus,c2)){
-			bus(c2).checked <- false;
+			bus(c2).green_light_checked <- false;
 		}
 		
 		if(contains(people,c1)){
-			people(c1).checked <- false;
+			people(c1).green_light_checked <- false;
 		} 
 		if(contains(people,c2)){
-			people(c2).checked <- false;
+			people(c2).green_light_checked <- false;
 		}
 	
 
@@ -526,45 +526,46 @@ species node_agt skills: [skill_road_node] {
 		
 		//現示処理（通行権付与処理）
 		if (is_blue) {		
-				current_shows <- [road(roads_in[0])];				
+				current_accessible <- [road(roads_in[0])];				
 				}else{
-				current_shows <- [road(roads_in[1]),road(roads_in[2])]; 
+				current_accessible <- [road(roads_in[1]),road(roads_in[2])]; 
 			}
 			
 		//現示の道路に車がいない時の処理
-		if(length(current_shows) != 0){
+		if(length(current_accessible) != 0){
 			
-			if(length(current_shows[0].all_agents) != 0 ){
-				c1 <- current_shows[0].all_agents[0]; 
+			if(length(current_accessible[0].all_agents) != 0 ){
+				c1 <- current_accessible[0].all_agents[0]; 
 				
 				if(contains(bus,c1)){
-					bus(c1).true_target <- bus(c1).target;
-					bus(c1).final_target <- any_location_in(self);
-					bus(c1).checked <- true;
+				    bus(c1).true_target <- bus(c1).target;
+					//bus(c1).final_target <- any_location_in(self);
+					bus(c1).a_flag_checked_pass_light <- int(any_location_in(self));
+					bus(c1).green_light_checked <- true;
 				}
 				
 				if(contains(people,c1)){
 					people(c1).true_target <- people(c1).target;
 					people(c1).final_target <- any_location_in(self);
-					people(c1).checked <- true;
+					people(c1).green_light_checked <- true;
 				}
 			}
 			
 			//現示の道路が二本以上の時
-			if(length(current_shows) > 1){
-				if(length(current_shows[1].all_agents) != 0){
-					c2 <- current_shows[1].all_agents[0];
+			if(length(current_accessible) > 1){
+				if(length(current_accessible[1].all_agents) != 0){
+					c2 <- current_accessible[1].all_agents[0];
 					
 					if(contains(bus,c2)){
 						bus(c2).true_target <- bus(c2).target;
-						bus(c2).final_target <-  any_location_in(self);
-						bus(c2).checked <- true;
+						//bus(c2).final_target <-  any_location_in(self);
+						bus(c2).a_flag_checked_pass_light <- int(any_location_in(self));
+						bus(c2).green_light_checked <- true;
 					}
-					
 					if(contains(people,c2)){
 						people(c2).true_target <- people(c2).target;
 						people(c2).final_target <- any_location_in(self);
-						people(c2).checked <- true;
+						people(c2).green_light_checked <- true;
 					}	
 				}
 			}
@@ -582,7 +583,7 @@ species node_agt skills: [skill_road_node] {
 	
 species people skills: [advanced_driving] { 
 	rgb color <- rnd_color(255);
-	bool checked;
+	bool green_light_checked;
 	node_agt target;
 	node_agt true_target;
 	
@@ -591,7 +592,7 @@ species people skills: [advanced_driving] {
 	}
 	
 	
-	reflex time_to_go when: final_target = nil and checked = false{
+	reflex time_to_go when: final_target = nil and green_light_checked = false{
 		
 		target <- one_of(node_agt);
 		if(true_target != nil){
@@ -605,7 +606,7 @@ species people skills: [advanced_driving] {
 		}
 	}
 	
-	reflex time_to_go_true when: final_target = nil and checked = true{	
+	reflex time_to_go_true when: final_target = nil and green_light_checked = true{	
 		current_path <- compute_path(graph: road_network, target: target );
 	}
 	
@@ -639,13 +640,12 @@ species people skills: [advanced_driving] {
 
 
 experiment traffic_simulation type: gui {
-	float minimum_cycle_duration<-0.4#s;
-	output {
+	float minimum_cycle_duration<-0.04#s;
+	/*output {
 		display city_display type: opengl{
 			species road aspect: geom refresh: false;
 			species node_agt aspect: geom3D;
 			species people aspect: icon;
 			species bus aspect: icon;
 		}
-	}
-}
+	}*/
