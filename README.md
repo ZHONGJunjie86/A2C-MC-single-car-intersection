@@ -40,6 +40,6 @@
            true_target <- node_agt(random_node);
            final_target <- node_agt(random_node).location;	
            location <- any_location_in(node_agt(5)); 
-　There are 12 nodes in the intersection map and the start point is fixed at the 5th point. Every time before a cycle there will be a random number between 0 and 12 to choose destination node. And the target-time and target speed will also be changed. In other words, I let the agent to learn different situations.
-　The target parameters need careful adjustment. Here's the curves of entropy and rewards.
+　There are 12 nodes in the intersection map and the start point is fixed at the 5th point. Every time before a cycle there will be a random number between 0 and 12 to choose destination node. And the target-time and target speed will also be changed. In other words, I let the agent to learn different situations.    
+　The target parameters need careful adjustment. Here's the curves of entropy and rewards.    
 　![image](https://github.com/ZHONGJunjie86/A3C-single-car-intersection/blob/master/illustrate/loss_curve.png) 
