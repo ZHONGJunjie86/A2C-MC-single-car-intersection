@@ -14,8 +14,7 @@
 * r speed： related to the target speed  
 * if sa ≤st: ks - kp*(target_speed - real_speed) 
 * if sa > st: ks - kp*(real_speed - target_speed ) 
-if(time_pass != 0){
-		  
+
 　In my experiment I set ky = ks = 0.05,kp = 0.001,kn = 0.03.   It's obviously I desire the agent to learn to control its speed around target-speed.  
 # About GAMA
 　The GAMA is a platefrom to do simulations.      
