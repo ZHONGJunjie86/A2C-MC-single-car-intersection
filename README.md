@@ -12,10 +12,11 @@
 * r terminal：-1：crash / time expires  
                  0:non-terminal state  
 * r speed： related to the target speed  
-* if sa ≤st: sa/st * kp;  
-* if sa > st: kp - (sa-st)/st * kn.  
-
-　In my experiment I set ky = ks = 0.05,kp = 0.001,kn = 0.03.   
+* if sa ≤st: ks - kp*(target_speed - real_speed) 
+* if sa > st: ks - kp*(real_speed - target_speed ) 
+if(time_pass != 0){
+		  
+　In my experiment I set ky = ks = 0.05,kp = 0.001,kn = 0.03.   It's obviously I desire the agent to learn to control its speed around target-speed.  
 # About GAMA
 　The GAMA is a platefrom to do simulations.      
 　I have a GAMA-modle "simple_intersection.gaml", which is assigned a car and some traffic lights. The model will sent some data  
