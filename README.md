@@ -15,7 +15,7 @@
 * if sa ≤st: ks - kp*(target_speed - real_speed) 
 * if sa > st: ks - kp*(real_speed - target_speed ) 
 
-　In my experiment I set ky = ks = 0.05,kp = 0.001,kn = 0.03.   It's obviously I desire the agent to learn to control its speed around target-speed.  
+　In my experiment I set ky = ks = 0.05,kp = 0.001,kn = 0.03.   It's obviously I desire the agent to learn to control its speed around the target-speed.  
 # About GAMA
 　The GAMA is a platefrom to do simulations.      
 　I have a GAMA-modle "simple_intersection.gaml", which is assigned a car and some traffic lights. The model will sent some data  
