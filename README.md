@@ -45,4 +45,5 @@
 　![image](https://github.com/ZHONGJunjie86/A3C-single-car-intersection/blob/master/illustrate/loss_curve.png) 
  Noticed that 
  ![image](https://github.com/ZHONGJunjie86/A3C-single-car-intersection/blob/master/illustrate/loss_curve_2.png)
+ ![image](https://github.com/ZHONGJunjie86/A2C-TD-single-car-intersection/blob/master/illustrate/loss_curve_MC.png)
       
