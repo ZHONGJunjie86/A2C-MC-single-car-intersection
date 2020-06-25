@@ -1,7 +1,8 @@
 # A2C-single-car-intersection
 　This is a basic model describing a car runs to goal in limited time by using MC-A2C algorithm to determine its speed.    
 　Depending on the architecture I wrote I'll write a A3C model in the next time, in which I'll complete a multi-agents system(MAS).  
-　However the MC algorithm doesn't convergent within 1000 cycles while the TD algorithm convergent convergents within 300 cycles.[Go to see my AC-TD work](https://github.com/ZHONGJunjie86/A3C-single-car-intersection)
+　However the MC algorithm doesn't convergent within 1000 cycles while the TD algorithm convergent convergents within 300 cycles.  
+　[Go to see my AC-TD work](https://github.com/ZHONGJunjie86/A3C-single-car-intersection)
 # Reward shaping
 　The work in this model is very simple.   
 　Input [real_speed, target_speed, elapsed_time_ratio, distance_to_goal,reward,done,time_pass,over]    
