@@ -6,7 +6,9 @@
 # Reward shaping
 　The work in this model is very simple.   
 　Input [real_speed, target_speed, elapsed_time_ratio, distance_to_goal,reward,done,time_pass,over]    
+　Station representation: [real_speed, target_speed, elapsed_time_ratio, distance_to_goal]
 　Output accelerate.
+　Action representation [accelerate].
   
 　The car will learn to control its accelerate with the restructions shown below:  
 　Reward shaping:  
