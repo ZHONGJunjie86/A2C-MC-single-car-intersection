@@ -13,7 +13,7 @@
                  0.005:non-terminal state  
 * r speed： related to the target speed  
 * if sa ≤st: 0.05 - 0.036*(target_speed / real_speed) 
-* if sa > st: 0.05 - 0,033*(real_speed / target_speed ) 
+* if sa > st: 0.05 - 0.033*(real_speed / target_speed ) 
 
 　In my experiment it's obviously I desire the agent to learn controling its speed around the target-speed.    
  　parameters:
@@ -28,13 +28,16 @@
            final_target <- node_agt(random_node).location;	
            location <- any_location_in(node_agt(5)); 
 　There are 12 nodes in the intersection map and the start point is fixed at the 5th point. Every time before a cycle there will be a random number between 0 and 12 used to choose destination node. And the target-time and target speed will also be changed.   
-　In other words, I let the agent to learn 3*11=33 situations.   
+　In other words, I let the agent to learn 3*11=33 situations. And in the ends of a cycle, the model will be trained only once.  
+　The rewards depend on the situation, so it will change every cycle.
  # MC&&TD
+ 　The MD algorithm is faster than the TD algorithm due to be trained only once while the TD algorithm is trained every step.    
+ 　However the MD algorithm doesn't convergent within 1000 cycles while the TD algorithm convergent convergents within 300 cycles.  
  <a href="https://www.codecogs.com/eqnedit.php?latex=\bigtriangledown&space;R&space;=&space;\frac{1}{N}\sum_{n=1}^{N}\sum_{t=1}^{T}(R(t)-V_{s}^{n})\bigtriangledown&space;log&space;P_{\Theta&space;}(a_{t}^{n}|s_{t}^{n})" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\bigtriangledown&space;R&space;=&space;\frac{1}{N}\sum_{n=1}^{N}\sum_{t=1}^{T}(R(t)-V_{s}^{n})\bigtriangledown&space;log&space;P_{\Theta&space;}(a_{t}^{n}|s_{t}^{n})" title="\bigtriangledown R = \frac{1}{N}\sum_{n=1}^{N}\sum_{t=1}^{T}(R(t)-V_{s}^{n})\bigtriangledown log P_{\Theta }(a_{t}^{n}|s_{t}^{n})" /></a>  
 　The target parameters need careful adjustment. Here's the curves of MC's critic_loss and cycle_total_rewards.    
   
  ![image](https://github.com/ZHONGJunjie86/A2C-TD-single-car-intersection/blob/master/illustrate/loss_curve_MC.png)  
-　Here's the curves of TD's critic_loss and cycle_total_rewards. 
+　Here's the curves of TD's critic_loss and cycle_total_rewards.   
  <a href="https://www.codecogs.com/eqnedit.php?latex=\bigtriangledown&space;R&space;=&space;\frac{1}{N}\sum_{n=1}^{N}\sum_{t=1}^{T}(r_{t}&plus;V_{s&plus;1}^{n}-V_{s}^{n})\bigtriangledown&space;log&space;P_{\Theta&space;}(a_{t}^{n}|s_{t}^{n})" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\bigtriangledown&space;R&space;=&space;\frac{1}{N}\sum_{n=1}^{N}\sum_{t=1}^{T}(r_{t}&plus;V_{s&plus;1}^{n}-V_{s}^{n})\bigtriangledown&space;log&space;P_{\Theta&space;}(a_{t}^{n}|s_{t}^{n})" title="\bigtriangledown R = \frac{1}{N}\sum_{n=1}^{N}\sum_{t=1}^{T}(r_{t}+V_{s+1}^{n}-V_{s}^{n})\bigtriangledown log P_{\Theta }(a_{t}^{n}|s_{t}^{n})" /></a>
  ![image](https://github.com/ZHONGJunjie86/A2C-TD-single-car-intersection/blob/master/illustrate/loss_curve_TD_21.png)  
  ### [Go to see my AC-TD work](https://github.com/ZHONGJunjie86/A3C-single-car-intersection)
