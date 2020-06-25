@@ -11,14 +11,14 @@
 　The car will learn to control its accelerate with the restructions shown below:  
 　Reward shaping:  
 * rt = r terminal + r danger + r speed  
-* r terminal： -0.13：crash / time expires 
+* r terminal： -0.013(target_speed > real_speed) or  -0.01(target_speed < real_speed)：crash / time expires 
                  0.005:non-terminal state  
 * r speed： related to the target speed  
 * if sa ≤st: 0.05 - 0.036*(target_speed / real_speed) 
 * if sa > st: 0.05 - 0.033*(real_speed / target_speed ) 
 
 　In my experiment it's obviously I desire the agent to learn controling its speed around the target-speed.    
- 　parameters:
+ 　[Go to see my hyperparameter optimization](https://github.com/ZHONGJunjie86/A3C-single-car-intersection)
 
   # Experiment
   ###### gama:
@@ -30,7 +30,7 @@
            final_target <- node_agt(random_node).location;	
            location <- any_location_in(node_agt(5)); 
 　There are 12 nodes in the intersection map and the start point is fixed at the 5th point. Every time before a cycle there will be a random number between 0 and 12 used to choose destination node. And the target-time and target speed will also be changed.   
-　In other words, I let the agent to learn 3*11=33 situations. And in the ends of a cycle, the model will be trained only once.  
+　In other words, I let the agent to learn 3*11=33 situations. And in the end of a cycle, the model will be trained only once.  
 　The rewards depend on the situation, so it will change every cycle.
  # MC&&TD
  　The MC algorithm is faster than the TD algorithm due to be trained only once while the TD algorithm is trained every step.    
